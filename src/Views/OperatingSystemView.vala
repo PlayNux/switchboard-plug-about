@@ -18,7 +18,7 @@
 * Boston, MA 02110-1301 USA
 */
 
-public class About.OperatingSystemView : Gtk.Grid {
+public class About.OperatingSystemView : Gtk.Box {
     private string support_url;
 
     private Gtk.Grid software_grid;
@@ -39,19 +39,20 @@ public class About.OperatingSystemView : Gtk.Grid {
             logo_icon_name = "distributor-logo";
         }
 
-        var logo = new Hdy.Avatar (128, "", false) {
+        // FIXME: Replace this whole thing with Gtk.Image?
+        var logo = new Adw.Avatar (128, "", false) {
             // In case the wallpaper can't be loaded, we don't want an icon or text
             icon_name = "invalid-icon-name",
-            // We need this for the shadow to not get clipped by Gtk.Overlay
-            margin = 6
+            // FIXME: use overflow instead
+            //margin = 6
         };
-        logo.set_image_load_func ((size) => {
-            try {
-                return new Gdk.Pixbuf.from_file_at_scale ("/usr/share/backgrounds/elementaryos-default", -1, size, true);
-            } catch (Error e) {
-                critical (e.message);
-            }
-        });
+        // logo.set_image_load_func ((size) => {
+        //     try {
+        //         return new Gdk.Pixbuf.from_file_at_scale ("/usr/share/backgrounds/elementaryos-default", -1, size, true);
+        //     } catch (Error e) {
+        //         critical (e.message);
+        //     }
+        // });
         logo.get_style_context ().add_provider (style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         var icon = new Gtk.Image () {
@@ -64,8 +65,9 @@ public class About.OperatingSystemView : Gtk.Grid {
         icon_style_context.add_class ("logo");
         icon_style_context.add_provider (style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-        var logo_overlay = new Gtk.Overlay ();
-        logo_overlay.add (logo);
+        var logo_overlay = new Gtk.Overlay () {
+            child = logo
+        };
         logo_overlay.add_overlay (icon);
 
         // Intentionally not using GLib.OsInfoKey.PRETTY_NAME here because we
@@ -155,10 +157,9 @@ public class About.OperatingSystemView : Gtk.Grid {
 
         margin = 12;
         orientation = Gtk.Orientation.VERTICAL;
-        row_spacing = 12;
-        add (software_grid);
-        add (button_grid);
-        show_all ();
+        spacing = 12;
+        append (software_grid);
+        append (button_grid);
 
         settings_restore_button.clicked.connect (settings_restore_clicked);
 
@@ -205,7 +206,6 @@ public class About.OperatingSystemView : Gtk.Grid {
                 xalign = 0
             };
             software_grid.attach (based_off, 1, 1, 3);
-            software_grid.show_all ();
         }
     }
 
@@ -227,10 +227,10 @@ public class About.OperatingSystemView : Gtk.Grid {
             "dialog-warning",
             Gtk.ButtonsType.CANCEL
         );
-        dialog.transient_for = (Gtk.Window) get_toplevel ();
+        dialog.transient_for = (Gtk.Window) get_root ();
 
         var continue_button = dialog.add_button (_("Restore Settings"), Gtk.ResponseType.ACCEPT);
-        continue_button.get_style_context ().add_class (Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION);
+        continue_button.get_style_context ().add_class (Granite.STYLE_CLASS_DESTRUCTIVE_ACTION);
 
         var result = dialog.run ();
         dialog.destroy ();

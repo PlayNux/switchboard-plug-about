@@ -32,10 +32,10 @@ shared_module(
         dependency('glib-2.0', version: '>=2.64.0'),
         dependency('gio-2.0'),
         dependency('gobject-2.0'),
-        dependency('granite'),
-        dependency('gtk+-3.0'),
+        dependency('granite-7'),
+        dependency('gtk4'),
         dependency('libgtop-2.0'),
-        dependency('libhandy-1'),
+        dependency('libadwaita-1'),
         dependency ('appstream', version: '>=0.12.10'),
         meson.get_compiler('vala').find_library('posix'),
         switchboard_dep
